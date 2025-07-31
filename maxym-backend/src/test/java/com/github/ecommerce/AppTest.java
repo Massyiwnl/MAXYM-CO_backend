@@ -1,4 +1,4 @@
-package com.github.massyiwnl;
+package com.github.ecommerce;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

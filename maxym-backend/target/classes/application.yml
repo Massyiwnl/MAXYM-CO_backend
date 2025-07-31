@@ -1,0 +1,163 @@
+spring:
+  application:
+    name: ecommerce-backend
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        jdbc:
+          batch_size: 25
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+    open-in-view: false
+    show-sql: false
+  
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: EcommerceHikariCP
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
+  
+  data:
+    redis:
+      repositories:
+        enabled: true
+  
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  
+  mvc:
+    throw-exception-if-no-handler-found: true
+  
+  web:
+    resources:
+      add-mappings: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  http2:
+    enabled: true
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/ecommerce.log
+    max-size: 10MB
+    max-history: 30
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      expiration: 900000 # 15 minutes
+      refresh-expiration: 604800000 # 7 days
+      header: Authorization
+      prefix: Bearer
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: "*"
+      exposed-headers: Authorization,Content-Type
+      allow-credentials: true
+      max-age: 3600
+  
+  mail:
+    from: ${MAIL_FROM:noreply@ecommerce.com}
+    from-name: ${MAIL_FROM_NAME:E-commerce}
+    base-url: ${APP_BASE_URL:http://localhost:3000}
+  
+  payment:
+    stripe:
+      api-key: ${STRIPE_API_KEY:}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    paypal:
+      client-id: ${PAYPAL_CLIENT_ID:}
+      client-secret: ${PAYPAL_CLIENT_SECRET:}
+      mode: ${PAYPAL_MODE:sandbox}
+  
+  storage:
+    cloudinary:
+      cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+      api-key: ${CLOUDINARY_API_KEY:}
+      api-secret: ${CLOUDINARY_API_SECRET:}
+  
+  rate-limit:
+    enabled: true
+    default-limit: 100
+    default-duration: 60
+    login-limit: 5
+    login-duration: 300
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: ${SWAGGER_ENABLED:true}
+    operations-sorter: method
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
